@@ -58,6 +58,7 @@ public class Robot extends TimedRobot {
   private SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(_rightBackCanSparkMax, _rightFrontCanSparkMax);
   private DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
 
+//Screwed Up Git Again, need to redo the variable speed for the shooter.
 
   CANSparkMax _collectVert = new CANSparkMax((13), MotorType.kBrushless);
 
@@ -85,6 +86,8 @@ public class Robot extends TimedRobot {
   Boolean lihtAct = false;
   double _tavar = 0.0;
   Boolean lightspeed = false;
+  double shooterSpeed = 0.1;
+  int isChangingSpeed = 0;
 
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
@@ -373,9 +376,22 @@ else {
         _magMotor2.set(0);
         }
 
+        //Add Shooter speed changer
+        if (dpadDir == 90 && isChangingSpeed == 0) {
+          shooterSpeed = shooterSpeed + 0.1;
+          isChangingSpeed = 1
+        }
+        else if (dpadDir == 270 && isChangingSpeed == 0) {
+          shooterSpeed = shooterSpeed - 0.1;
+          isChangingSpeed = 1
+        }
+        else if (isChangingSpeed == 1) {
+          isChangingSpeed = 0;
+        }
+
         if (shooterButton && !collectorButton) {
-        _shooterMotorLeft.set(-0.8);
-        _shooterMotorRight.set(0.8);
+        _shooterMotorLeft.set(-shooterSpeed);
+        _shooterMotorRight.set(shooterSpeed;
                 _magMotor2.set(0.4);
         }
       else if (!shooterButton && !collectorButton) {
@@ -389,7 +405,8 @@ else {
 
         SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
         SmartDashboard.putNumber("bottomSensorLock", bottomSensorLock);        
-        SmartDashboard.putBoolean("isGettingBall", isGettingBall);
+        SmartDashboard.putBoolean("isGettingBall", isGettingBall);  
+        SmartDashboard.putNumber("Shooter Speed", shooterSpeed * 100);        
 
     
         
