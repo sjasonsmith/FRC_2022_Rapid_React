@@ -106,6 +106,9 @@ public class Robot extends TimedRobot {
   private double m_LimelightSteerCommand = 0.0;
   private boolean isGettingBall = false;
 
+   CANEncoder leftBack_encoder = _leftBackCanSparkMax.getEncoder();
+    CANEncoder rightBack_encoder = _rightBackCanSparkMax.getEncoder();
+
   int numbOfBalls;
 
   int bottomSensorLock;
@@ -134,10 +137,10 @@ public class Robot extends TimedRobot {
 
 
 //Set IDLE Modes for SparkMax's
-    _leftBackCanSparkMax.setIdleMode(IdleMode.kCoast);
-    _leftFrontCanSparkMax.setIdleMode(IdleMode.kCoast);
-    _rightBackCanSparkMax.setIdleMode(IdleMode.kCoast);
-    _rightFrontCanSparkMax.setIdleMode(IdleMode.kCoast);
+    _leftBackCanSparkMax.setIdleMode(IdleMode.kBrake);
+    _leftFrontCanSparkMax.setIdleMode(IdleMode.kBrake);
+    _rightBackCanSparkMax.setIdleMode(IdleMode.kBrake);
+    _rightFrontCanSparkMax.setIdleMode(IdleMode.kBrake);
 
 
 //Add Colors For Color Matcher to Find
@@ -164,18 +167,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    navxReadout();
+    // navxReadout();
+    encoderProcessing();
 
-    CANEncoder leftBack_encoder = _leftBackCanSparkMax.getEncoder();
-    CANEncoder rightBack_encoder = _rightBackCanSparkMax.getEncoder();
+   
 
     SmartDashboard.putBoolean("SpeedToggle", speedToggle);
     SmartDashboard.putBoolean("LightSpeed", lightspeed);
-    SmartDashboard.putNumber("Left Encoder", leftBack_encoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder", rightBack_encoder.getPosition());
-
-    SmartDashboard.putNumber("Left Encoder_Graph", leftBack_encoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder_Graph", rightBack_encoder.getPosition());
+    
 
     SmartDashboard.putBoolean("BottomSensor", bottomSensor.get());
 
@@ -275,6 +274,7 @@ public class Robot extends TimedRobot {
 
     double forward = (_leftjoyforwardRaw * 0.5);
     double rotate = (_rightsidejoysideRaw * 0.5);
+    
 
     if (_joystick1.getRawButton(3)) {
       limelightAutonomous();
@@ -284,7 +284,7 @@ public class Robot extends TimedRobot {
       camMode.setDouble(1);
     }
 
-    m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), false);
+    m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), true);
 
     // Lifting and collecting
     //Set Buttons
@@ -379,11 +379,11 @@ else {
         //Add Shooter speed changer
         if (dpadDir == 90 && isChangingSpeed == 0) {
           shooterSpeed = shooterSpeed + 0.1;
-          isChangingSpeed = 1
+          isChangingSpeed = 1;
         }
         else if (dpadDir == 270 && isChangingSpeed == 0) {
           shooterSpeed = shooterSpeed - 0.1;
-          isChangingSpeed = 1
+          isChangingSpeed = 1;
         }
         else if (isChangingSpeed == 1) {
           isChangingSpeed = 0;
@@ -391,7 +391,7 @@ else {
 
         if (shooterButton && !collectorButton) {
         _shooterMotorLeft.set(-shooterSpeed);
-        _shooterMotorRight.set(shooterSpeed;
+        _shooterMotorRight.set(shooterSpeed);
                 _magMotor2.set(0.4);
         }
       else if (!shooterButton && !collectorButton) {
@@ -676,6 +676,14 @@ else {
   public void startShooterTimer() {
     shooterTimer.reset();
     shooterTimer.start();
+  }
+
+  public void encoderProcessing() {
+    SmartDashboard.putNumber("Left Encoder", leftBack_encoder.getPosition());
+    SmartDashboard.putNumber("Right Encoder", rightBack_encoder.getPosition());
+
+    SmartDashboard.putNumber("Left Encoder_Graph", leftBack_encoder.getPosition());
+    SmartDashboard.putNumber("Right Encoder_Graph", rightBack_encoder.getPosition());
   }
 
 }
