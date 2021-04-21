@@ -88,6 +88,8 @@ public class Robot extends TimedRobot {
   Boolean lightspeed = false;
   double shooterSpeed = 0.1;
   int isChangingSpeed = 0;
+  int reachedPoint = 0;
+  int reachedPoint1 = 1;
 
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
@@ -97,6 +99,8 @@ public class Robot extends TimedRobot {
   private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
   private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
   private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
+
+  double encoderInches = 0;
 
   NetworkTableEntry ledEntry;
   NetworkTableEntry camMode;
@@ -224,35 +228,67 @@ public class Robot extends TimedRobot {
     teleopInit();
 
     // Reset timer to 0sec
-    myTimer.reset();
+    // myTimer.reset();
 
     // Start timer
-    myTimer.start();
+    // myTimer.start();
   }
 
   @Override
   public void autonomousPeriodic() {
-    // m_Drive.tankDrive(0.6, 0.6);
-    // If is has been less than 2 seconds since autonomous started, drive forwards
-    if (myTimer.get() < 1.0) {
-      m_Drive.tankDrive(0.6, 0.6);
-    }
 
-    // If more than 2 seconds have elapsed, stop driving and turn off the timer
-    else {
-      m_Drive.tankDrive(0, 0);
-      myTimer.stop();
-    }
+if (encoderInches <= -17) {
+  reachedPoint = 1;
+}
+if (encoderInches >= 0) {
+  reachedPoint1 = 1;
+}
+
+if (reachedPoint == 1 && encoderInches <= -17) {
+            reachedPoint1 = 0;
+}
+if (reachedPoint1 == 1 && encoderInches >= 0) {
+  reachedPoint = 0;
+}
+   
+
+if (reachedPoint == 0) {
+
+            m_Drive.arcadeDrive(0.1, 0, false);
+            //println('Less Then 17');
+      }
+
+      else if (reachedPoint1 == 0) {
+          m_Drive.arcadeDrive(-0.1, 0, false);
+          // println('At Then 17');
+          // m_Drive.arcadeDrive(0, 0, true);
+        
+
+      }
+      else {
+            m_Drive.arcadeDrive(0.0, 0.0, true);
+      }
+
+    
+                  // m_Drive.arcadeDrive(0.1, 0, false);
+                  //Forward value, rotate value, square inputs
+
+      SmartDashboard.putNumber("reachedPoint", reachedPoint);    
+      SmartDashboard.putNumber("reachedPoint1", reachedPoint1);    
+
   }
 
   @Override
   public void teleopInit() {
     speedToggle = false;
+    lightspeed = false;
     Update_Limelight_Tracking();
     limelightTracking(false);
     numbOfBalls = 0;
     bottomSensorLock = 1;
     topSensorLock = 1;
+    rightBack_encoder.setPosition(0);
+    leftBack_encoder.setPosition(0);
   }
 
   @Override
@@ -284,8 +320,14 @@ public class Robot extends TimedRobot {
       camMode.setDouble(1);
     }
 
-    m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), true);
 
+  if (!_joystick1.getRawButton(7)) {
+    m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate * 1.2: rotate), true);
+  }
+  else if (_joystick1.getRawButton(7)) {
+    m_Drive.arcadeDrive(forward * 1.5, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), true);
+
+  }
     // Lifting and collecting
     //Set Buttons
 
@@ -539,15 +581,17 @@ else {
   }
 
   public void buttonToggles() {
-    int speedbutton = 11;
+    // int speedbutton = 11;
+    // if (_joystick1.getRawButtonPressed(speedbutton)) {
+    //   if (!speedToggle) {
+    //     speedToggle = true;
+    //   } else if (speedToggle) {
+    //     speedToggle = false;
+    //   }
+    // }
 
-    if (_joystick1.getRawButtonPressed(speedbutton)) {
-      if (!speedToggle) {
-        speedToggle = true;
-      } else if (speedToggle) {
-        speedToggle = false;
-      }
-    }
+
+
   }
 
   public void navxReadout() {
@@ -679,11 +723,23 @@ else {
   }
 
   public void encoderProcessing() {
-    SmartDashboard.putNumber("Left Encoder", leftBack_encoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder", rightBack_encoder.getPosition());
+    SmartDashboard.putNumber("Left Encoder RAW", leftBack_encoder.getPosition());
+    SmartDashboard.putNumber("Right Encoder RAW", rightBack_encoder.getPosition());
 
     SmartDashboard.putNumber("Left Encoder_Graph", leftBack_encoder.getPosition());
     SmartDashboard.putNumber("Right Encoder_Graph", rightBack_encoder.getPosition());
+
+    //Add encoder data processing, so Encoder Ticks -> Shaft Rotations -> Gearbox rotations -> Inches Traveled
+
+    //Aprox 9.5 'ticks' is one revolution on the Wheel
+
+    //5 Inch Wheel at one revolution is 5*pi is inches? So in one rotation it would be 15.7 inches 
+    //Circumfrence (Distance Traveled By Rotation) is C=d*Pi
+
+    encoderInches = (rightBack_encoder.getPosition() * Math.PI) / 1.5;
+    SmartDashboard.putNumber("Right Encoder Inches Traveled", encoderInches);
+
+
   }
 
 }
