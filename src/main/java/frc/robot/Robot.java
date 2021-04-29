@@ -236,67 +236,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-
-// if (encoderInches <= -17) {
-//   reachedPoint = 1;
-// }
-// if (encoderInches >= 0) {
-//   reachedPoint1 = 1;
-// }
-
-// if (reachedPoint == 1 && encoderInches <= -17) {
-//             reachedPoint1 = 0;
-// }
-// if (reachedPoint1 == 1 && encoderInches >= 0) {
-//   reachedPoint = 0;
-// }
-   
-
-// if (reachedPoint == 0) {
-
-//             m_Drive.arcadeDrive(0.1, 0, true);
-//             //println('Less Then 17');
-//       }
-
-//       else if (reachedPoint1 == 0) {
-//           m_Drive.arcadeDrive(-0.1, 0, true);
-//           // println('At Then 17');
-//           // m_Drive.arcadeDrive(0, 0, true);
-        
-
-//       }
-//       else {
-//             m_Drive.arcadeDrive(0.0, 0.0, true);
-//       }
-
-    
-//                   // m_Drive.arcadeDrive(0.1, 0, false);
-//                   //Forward value, rotate value, square inputs
-
-//       SmartDashboard.putNumber("reachedPoint", reachedPoint);    
-//       SmartDashboard.putNumber("reachedPoint1", reachedPoint1);    
-
 //Do PID Loop to get smooth motion so tracking is more accurate
 //'Error' is the distance to the goal
 //Proportional (x error) is the max speed
 //Integral (x ) area under a curve or line, is sum of all past error
 //Derivative calculates the change in error, can predict future system behavior.
+PID();
+double speedLimit = 0.1;
 
-int targetInches = 17;
-
-double P = 1.0; //Oos time 1.75 s
-double I = 0;
-double D = 0; //Causes bad ossilations if not 0
-
-double speedLimit = 0.3;
-
-double error = targetInches - encoderInches; //Error = Target - Actual
-double gral =+ (error * 0.02); // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
-double derivative = (error - 0) / 0.02;
-double output = P*error + I*gral + D*derivative;
-
+double output = rcw;
 double outputParsed;
- 
+
+
+ // Incase the PID output is above a certain limit, implement this:
 if (output > 1) {
   outputParsed = speedLimit;
 }
@@ -307,17 +259,31 @@ else {
   outputParsed = output;
 }
 
-// outputParsed = output;
+// outputParsed = 0;
 
-// if (encoderInches >= targetInches - 1.1) {
-//   outputParsed = 0;
-// }
 
-m_Drive.arcadeDrive(outputParsed, 0, true);
+m_Drive.arcadeDrive(outputParsed, 0, false);
 
-SmartDashboard.putNumber("PID Out", outputParsed);    
+SmartDashboard.putNumber("PID Out", rcw);    
 
   }
+
+double P = 0.6; //Oos time 0.48 s
+double I = 1.5;
+double D = 0.036; //Causes bad ossilations if not 0
+int integral, previous_error, setpoint = 0;
+int targetInches = 17;
+double rcw;
+
+public void PID(){
+
+
+        double error = targetInches - encoderInches; // Error = Target - Actual
+        integral += (error*.02); // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
+        double derivative = (error - previous_error) / .02;
+        rcw = P*error + I*integral + D*derivative;
+    }
+
 
   @Override
   public void teleopInit() {
