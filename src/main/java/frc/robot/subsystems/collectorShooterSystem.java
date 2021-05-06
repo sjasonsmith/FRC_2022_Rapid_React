@@ -1,14 +1,17 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.DigitalInput;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.command.Subsystem;
 
-public class collectorShooterSystem extends Subsystem
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Spark;
+// import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+
+public class collectorShooterSystem extends SubsystemBase
  {
 
     private CANSparkMax _collectVert = new CANSparkMax((13), MotorType.kBrushless);
@@ -38,50 +41,54 @@ public class collectorShooterSystem extends Subsystem
     // SmartDashboard.putBoolean("isGettingBall", isGettingBall);  
     // SmartDashboard.putNumber("Shooter Speed", shooterSpeed * 100); 
 
+    @Override
+    public void periodic() {
+        //public void ballCounter(){
+            //Call this every tick to count and move balls
+            if (bottomSensorLock == 0 && !bottomSensor.get()) {
+                numbOfBalls ++;
+                bottomSensorLock = 1;
+                isGettingBall = true;
+            }
+            else if (bottomSensorLock == 1 && bottomSensor.get()) {
+                bottomSensorLock = 0;
+                isGettingBall = false;
+            }
+        
+                if (topSensorLock == 0 && topSensor.get()) {
+                    numbOfBalls --;
+                    topSensorLock = 1;
+                }
+                else if (topSensorLock == 1 && !topSensor.get()) {
+                    topSensorLock = 0;
+                }
+    
+        if (numbOfBalls == 0) {
+            _magMotor1.set(-0.4);
+        }
+        else if (numbOfBalls >= 1 && topSensor.get()) {
+            _magMotor1.set(-0.4);
+            _magMotor2.set(0.4);
+        }
+        else if (numbOfBalls >= 1 && !topSensor.get()){
+            _magMotor1.set(-0.4);
+            _magMotor2.set(0);
+        }
+        else {
+            _magMotor1.set(0);
+            _magMotor2.set(0);
+        }
+    
+        //}
+    }
+
+
     public void liftCollector() {
         _liftmotor.set(ControlMode.PercentOutput, collectorSpeed);
     }
 
     public void lowerCollector() {
         _liftmotor.set(ControlMode.PercentOutput, -collectorSpeed);
-    }
-
-    public void ballCounter(){
-        //Call this every tick to count and move balls
-        if (bottomSensorLock == 0 && !bottomSensor.get()) {
-            numbOfBalls ++;
-            bottomSensorLock = 1;
-            isGettingBall = true;
-        }
-        else if (bottomSensorLock == 1 && bottomSensor.get()) {
-            bottomSensorLock = 0;
-            isGettingBall = false;
-        }
-    
-            if (topSensorLock == 0 && topSensor.get()) {
-                numbOfBalls --;
-                topSensorLock = 1;
-            }
-            else if (topSensorLock == 1 && !topSensor.get()) {
-                topSensorLock = 0;
-            }
-
-    if (numbOfBalls == 0) {
-        _magMotor1.set(-0.4);
-    }
-    else if (numbOfBalls >= 1 && topSensor.get()) {
-        _magMotor1.set(-0.4);
-        _magMotor2.set(0.4);
-    }
-    else if (numbOfBalls >= 1 && !topSensor.get()){
-        _magMotor1.set(-0.4);
-        _magMotor2.set(0);
-    }
-    else {
-        _magMotor1.set(0);
-        _magMotor2.set(0);
-    }
-
     }
 
   public void shooterSpeedUp() {
