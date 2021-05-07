@@ -63,23 +63,6 @@ public class collectorShooterSystem extends SubsystemBase
                     topSensorLock = 0;
                 }
     
-        if (numbOfBalls == 0) {
-            _magMotor1.set(-0.4);
-        }
-        else if (numbOfBalls >= 1 && topSensor.get()) {
-            _magMotor1.set(-0.4);
-            _magMotor2.set(0.4);
-        }
-        else if (numbOfBalls >= 1 && !topSensor.get()){
-            _magMotor1.set(-0.4);
-            _magMotor2.set(0);
-        }
-        else {
-            _magMotor1.set(0);
-            _magMotor2.set(0);
-        }
-    
-        //}
     }
 
 
@@ -105,6 +88,8 @@ public class collectorShooterSystem extends SubsystemBase
 //         }
 
 
+
+
     public void shootBalls() {
         _shooterMotorLeft.set(-shooterSpeed);
         _shooterMotorRight.set(shooterSpeed);
@@ -114,6 +99,22 @@ public class collectorShooterSystem extends SubsystemBase
     public void collectBalls() {
         _ColectorMotor.set(ControlMode.PercentOutput, -0.5);
         _collectVert.set(-0.5);
+
+        if (numbOfBalls == 0) {
+            _magMotor1.set(-0.4);
+        }
+        else if (numbOfBalls >= 1 && topSensor.get()) {
+            _magMotor1.set(-0.4);
+            _magMotor2.set(0.4);
+        }
+        else if (numbOfBalls >= 1 && !topSensor.get()){
+            _magMotor1.set(-0.4);
+            _magMotor2.set(0);
+        }
+        else {
+            _magMotor1.set(0);
+            _magMotor2.set(0);
+        }
     }
 
 }
