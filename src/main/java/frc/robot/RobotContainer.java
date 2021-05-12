@@ -1,8 +1,12 @@
 package frc.robot;
 
-import frc.robot.commands.liftCollector;
+// import frc.robot.commands.liftCollector;
 import frc.robot.subsystems.collectorShooterSystem;
+import frc.robot.subsystems.drivingSystem;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /*
@@ -18,28 +22,40 @@ public class RobotContainer {
 
   //Define Subsystems
   private final collectorShooterSystem _shooter = new collectorShooterSystem();
-  private JoystickButton collectorButton;
-  private JoystickButton shootButton;
-
+  private final drivingSystem _driving = new drivingSystem();
 
   public RobotContainer() {
     configureButtonBindings();
 
-    collectorButton.whenPressed(new liftCollector());
-
+    _driving.setDefaultCommand();
   }
+
 
 private void configureButtonBindings() {
   int dpadDir = driveStick.getPOV(0);
-    double _leftjoyforwardRaw = -driveStick.getRawAxis(1);
-    double _rightsidejoysideRaw = driveStick.getRawAxis(4);
+    
+  
+  // Driving
+  
+  double _leftjoyforwardRaw = -driveStick.getRawAxis(1);
+  double _rightsidejoysideRaw = driveStick.getRawAxis(4);
+  
+    
+    
+    
+    
+    
     // boolean 
     Boolean liftUp = (dpadDir == 0) ? true : false; //ADD DPAD UP
     Boolean liftDown = (dpadDir == 180) ? true : false; //ADD DPAD DOWN
-    // JoystickButton liftUp = new JoystickButton(driveStick, driveStick.getPOV(0));
-    // JoystickButton liftDown = new JoystickButton(driveStick, dpadDir == 180);
-    collectorButton = new JoystickButton(driveStick, 5);
-    shootButton = new JoystickButton(driveStick, 6);
+    
+    //Collector, Left Bumper
+      new JoystickButton(driveStick, 5).whenPressed(() -> _shooter.collectBalls()).whenReleased(() -> _shooter.stopAllMotors());
+    
+    
+    // shootButton = new JoystickButton(driveStick, 6);
+
+
 
   }
 }

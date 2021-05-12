@@ -23,7 +23,7 @@ public class collectorShooterSystem extends SubsystemBase
     private DigitalInput topSensor = new DigitalInput(1);
     private Spark _magMotor1 = new Spark(0);
     private Spark _magMotor2 = new Spark(1);
-    private final double rampSeconds = 0.15;
+    // private final double rampSeconds = 0.15;
     // _shooterMotorLeft.setOpenLoopRampRate(rampSeconds);
     // _shooterMotorRight.setOpenLoopRampRate(rampSeconds);
     // _collectVert.setOpenLoopRampRate(rampSeconds);
@@ -116,5 +116,16 @@ public class collectorShooterSystem extends SubsystemBase
             _magMotor2.set(0);
         }
     }
+
+    public void stopAllMotors() {
+        _magMotor1.set(0);
+        _magMotor2.set(0);
+        _shooterMotorLeft.set(0);
+        _shooterMotorRight.set(0);
+        _collectVert.set(0);
+        _ColectorMotor.set(ControlMode.PercentOutput, 0);
+    }
+
+
 
 }
