@@ -1,14 +1,21 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.collectorShooterSystem;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
+  // private final collectorShooterSystem _shooter = new collectorShooterSystem();
+  Joystick driveStick = new Joystick(0);
+  int dpadDir = driveStick.getPOV(0);
+  Boolean liftUp = (dpadDir == 0) ? true : false; //ADD DPAD UP
+  Boolean liftDown = (dpadDir == 180) ? true : false; //ADD DPAD DOWN
   // CommandScheduler.getInstance().setDefaultCommand(collectorShooterSystem, ballCounter);
 
   @Override
@@ -41,6 +48,10 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    
+    
+    
+    
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
   }
@@ -48,9 +59,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    
+    
+   
+
+
 
   }
-
-
 
 }
