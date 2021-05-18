@@ -1,10 +1,9 @@
 package frc.robot;
 
-// import frc.robot.commands.driveJoystick;
-// import frc.robot.commands.liftCollector;
 import frc.robot.subsystems.collectorShooterSystem;
 import frc.robot.subsystems.drivingSystem;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -21,14 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
 
   Joystick driveStick = new Joystick(0);
-
-   // Driving
-  
-  // double _leftjoyforwardRaw = -driveStick.getRawAxis(1);
-  // double _rightsidejoysideRaw = driveStick.getRawAxis(4);
-  // double forward = (_leftjoyforwardRaw * 0.5);
-  // double rotate = (_rightsidejoysideRaw * 0.5);
-  // Boolean squareInput = true;
 
   //Define Subsystems
   private final collectorShooterSystem _shooter = new collectorShooterSystem();
@@ -47,34 +38,14 @@ public class RobotContainer {
 
 
 private void configureButtonBindings() {
-  int dpadDir = driveStick.getPOV(0);
-    
-  
- 
-  
-    
-    
-    
-    
-    
-    // boolean 
-    Boolean liftUp = (dpadDir == 0) ? true : false; //ADD DPAD UP
-    Boolean liftDown = (dpadDir == 180) ? true : false; //ADD DPAD DOWN
-    
-    //Collector, Left Bumper
+
       new JoystickButton(driveStick, 5).whenPressed(() -> _shooter.collectBalls()).whenReleased(() -> _shooter.stopAllMotors());
 
-      if (liftUp) {
-        _shooter.liftCollector();
-      }    
-      else if (liftDown) {
-        _shooter.lowerCollector();
-      }
-      else {
-        _shooter.stopAllMotors();
-      }
+      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 0).whenPressed(() -> _shooter.liftCollector()).whenReleased(() -> _shooter.stopLiftMotors());
     
-    // shootButton = new JoystickButton(driveStick, 6);
+      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 180).whenPressed(() -> _shooter.lowerCollector()).whenReleased(() -> _shooter.stopLiftMotors());
+
+      // shootButton = new JoystickButton(driveStick, 6);
 
 
 

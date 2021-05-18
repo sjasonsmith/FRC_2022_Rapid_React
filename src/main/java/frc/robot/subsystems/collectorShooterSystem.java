@@ -30,7 +30,7 @@ public class collectorShooterSystem extends SubsystemBase
     int numbOfBalls = 0;
     int bottomSensorLock = 1;
     int topSensorLock = 1;
-        double collectorSpeed = 0.4;
+    double collectorSpeed = 0.4;
     double shooterSpeed = 0.1;
     Boolean isGettingBall = false;
 
@@ -62,6 +62,8 @@ public class collectorShooterSystem extends SubsystemBase
                 else if (topSensorLock == 1 && !topSensor.get()) {
                     topSensorLock = 0;
                 }
+
+               
     
     }
 
@@ -124,6 +126,10 @@ public class collectorShooterSystem extends SubsystemBase
         _shooterMotorRight.set(0);
         _collectVert.set(0);
         _ColectorMotor.set(ControlMode.PercentOutput, 0);
+    }
+
+    public void stopLiftMotors() {
+        _liftmotor.set(ControlMode.PercentOutput, 0);
     }
 
 
