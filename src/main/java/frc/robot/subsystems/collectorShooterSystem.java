@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -63,7 +64,9 @@ public class collectorShooterSystem extends SubsystemBase
                     topSensorLock = 0;
                 }
 
-               
+                SmartDashboard.putNumber("Number Of Balls", numbOfBalls);    
+                SmartDashboard.putNumber("ShooterSpeed", shooterSpeed);    
+
     
     }
 
@@ -77,12 +80,25 @@ public class collectorShooterSystem extends SubsystemBase
     }
 
   public void shooterSpeedUp() {
-    shooterSpeed = shooterSpeed + 0.1;
+
+    if (shooterSpeed > 1|| shooterSpeed < 0.1) {
+        return;
+    }
+    else {
+        shooterSpeed = shooterSpeed + 0.1;
+    }
+
   }
 
   public void shooterSpeedDowm() {
-    shooterSpeed = shooterSpeed - 0.1;
+
+    if (shooterSpeed == 1 || shooterSpeed > 0.1) {
+    shooterSpeed = shooterSpeed - 0.1; }
+  
+  else if (shooterSpeed == 0.1) {
+      return;
   }
+}
 
 // Memento
 //   else if (isChangingSpeed == 1) {
