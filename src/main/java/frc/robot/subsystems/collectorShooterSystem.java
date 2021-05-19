@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -81,22 +82,23 @@ public class collectorShooterSystem extends SubsystemBase
 
   public void shooterSpeedUp() {
 
-    if (shooterSpeed > 1|| shooterSpeed < 0.1) {
-        return;
-    }
-    else {
+    if (shooterSpeed < 1 && shooterSpeed >= 0.1) {
+        
         shooterSpeed = shooterSpeed + 0.1;
+    }
+    else if (shooterSpeed >= 1.0){
+    shooterSpeed = 1.0;
     }
 
   }
 
   public void shooterSpeedDowm() {
 
-    if (shooterSpeed == 1 || shooterSpeed > 0.1) {
+    if (shooterSpeed >= 1 || shooterSpeed > 0.1) {
     shooterSpeed = shooterSpeed - 0.1; }
   
-  else if (shooterSpeed == 0.1) {
-      return;
+  else if (shooterSpeed <= 0.1) {
+      shooterSpeed = 0.1;
   }
 }
 
@@ -109,6 +111,8 @@ public class collectorShooterSystem extends SubsystemBase
 
 
     public void shootBalls() {
+        _shooterMotorLeft.setIdleMode(IdleMode.kCoast);
+        _shooterMotorRight.setIdleMode(IdleMode.kCoast);
         _shooterMotorLeft.set(-shooterSpeed);
         _shooterMotorRight.set(shooterSpeed);
         _magMotor2.set(0.4);
@@ -146,8 +150,18 @@ public class collectorShooterSystem extends SubsystemBase
 
     public void stopLiftMotors() {
         _liftmotor.set(ControlMode.PercentOutput, 0);
+
     }
 
+    public void stopShooterMotors() {
+        _shooterMotorLeft.set(0);
+        _shooterMotorRight.set(0);
+        _magMotor1.set(0);
+        _magMotor2.set(0);
+        _shooterMotorLeft.setIdleMode(IdleMode.kBrake);
+        _shooterMotorRight.setIdleMode(IdleMode.kBrake);
+       
+    }
 
 
 }
