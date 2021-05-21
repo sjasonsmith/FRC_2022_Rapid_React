@@ -51,11 +51,11 @@ private void configureButtonBindings() {
       // shootButton = new JoystickButton(driveStick, 6);
       // Shooter
 
-      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 90).whenPressed(() -> _shooter.shooterSpeedUp()).whenReleased(() -> _shooter.stopAllMotors());
+      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 90).whenPressed(() -> _shooter.shooterSpeedUp());
 
-      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 270).whenPressed(() -> _shooter.shooterSpeedDowm()).whenReleased(() -> _shooter.stopAllMotors());
+      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 270).whenPressed(() -> _shooter.shooterSpeedDowm());
 
-      new JoystickButton(driveStick, 6).whenPressed(() -> _shooter.shootBalls()).whenReleased(() -> _shooter.stopShooterMotors());
+      new JoystickButton(driveStick, 6).whileHeld(() -> _shooter.shootBalls()).whenReleased(() -> _shooter.stopShooterMotors());
 
 
   }
