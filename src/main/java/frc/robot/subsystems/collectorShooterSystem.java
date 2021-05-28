@@ -67,6 +67,7 @@ public class collectorShooterSystem extends SubsystemBase
 
                 SmartDashboard.putNumber("Number Of Balls", numbOfBalls);    
                 SmartDashboard.putNumber("ShooterSpeed", shooterSpeed);    
+                SmartDashboard.putBoolean("IsGettingBall", isGettingBall);  
 
     
     }
@@ -111,8 +112,7 @@ public class collectorShooterSystem extends SubsystemBase
 
 
     public void shootBalls() {
-        _shooterMotorLeft.setIdleMode(IdleMode.kCoast);
-        _shooterMotorRight.setIdleMode(IdleMode.kCoast);
+        
         _shooterMotorLeft.set(-shooterSpeed);
         _shooterMotorRight.set(shooterSpeed);
         _magMotor2.set(0.4);
@@ -158,8 +158,6 @@ public class collectorShooterSystem extends SubsystemBase
         _shooterMotorRight.set(0);
         _magMotor1.set(0);
         _magMotor2.set(0);
-        _shooterMotorLeft.setIdleMode(IdleMode.kBrake);
-        _shooterMotorRight.setIdleMode(IdleMode.kBrake);
        
     }
 
