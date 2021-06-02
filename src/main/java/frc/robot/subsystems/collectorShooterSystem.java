@@ -43,7 +43,7 @@ public class collectorShooterSystem extends SubsystemBase
     // SmartDashboard.putBoolean("isGettingBall", isGettingBall);  
     // SmartDashboard.putNumber("Shooter Speed", shooterSpeed * 100); 
 
-    @Override
+    // @Override
     public void periodic() {
         //public void ballCounter(){
             //Call this every tick to count and move balls
@@ -112,7 +112,8 @@ public class collectorShooterSystem extends SubsystemBase
 
 
     public void shootBalls() {
-        
+        _shooterMotorLeft.setIdleMode(IdleMode.kCoast);
+        _shooterMotorRight.setIdleMode(IdleMode.kCoast);
         _shooterMotorLeft.set(-shooterSpeed);
         _shooterMotorRight.set(shooterSpeed);
         _magMotor2.set(0.4);

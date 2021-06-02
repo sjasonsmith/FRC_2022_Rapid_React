@@ -39,7 +39,7 @@ public class RobotContainer {
 
 private void configureButtonBindings() {
 
-      new JoystickButton(driveStick, 5).whenPressed(() -> _shooter.collectBalls()).whenReleased(() -> _shooter.stopAllMotors());
+      new JoystickButton(driveStick, 5).whileHeld(() -> _shooter.collectBalls()).whenReleased(() -> _shooter.stopAllMotors());
 
 
       // Lift And Lower Collector
