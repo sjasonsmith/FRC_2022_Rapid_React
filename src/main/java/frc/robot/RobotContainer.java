@@ -41,6 +41,8 @@ private void configureButtonBindings() {
 
       new JoystickButton(driveStick, 5).whileHeld(() -> _shooter.collectBalls()).whenReleased(() -> _shooter.stopAllMotors());
 
+      new JoystickButton(driveStick, 3).whileHeld(() -> _driving.driveDistance(10)).whenReleased(() -> _driving.stopAllMotors());
+
 
       // Lift And Lower Collector
       new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 0).whenPressed(() -> _shooter.liftCollector()).whenReleased(() -> _shooter.stopLiftMotors());
