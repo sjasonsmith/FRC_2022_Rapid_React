@@ -17,18 +17,19 @@ public class collectorShooterSystem extends SubsystemBase
  {
 
     private CANSparkMax _collectVert = new CANSparkMax((13), MotorType.kBrushless);
+
     private CANSparkMax _shooterMotorLeft = new CANSparkMax((14), MotorType.kBrushless);
-    private CANSparkMax _shooterMotorRight = new CANSparkMax((15), MotorType.kBrushless); 
+    private CANSparkMax _shooterMotorRight = new CANSparkMax((15), MotorType.kBrushless);
+
     private TalonSRX _ColectorMotor = new TalonSRX(11);
     private TalonSRX _liftmotor = new TalonSRX(12);
+
     private DigitalInput bottomSensor = new DigitalInput(0);
     private DigitalInput topSensor = new DigitalInput(1);
+    
     private Spark _magMotor1 = new Spark(0);
     private Spark _magMotor2 = new Spark(1);
-    // private final double rampSeconds = 0.15;
-    // _shooterMotorLeft.setOpenLoopRampRate(rampSeconds);
-    // _shooterMotorRight.setOpenLoopRampRate(rampSeconds);
-    // _collectVert.setOpenLoopRampRate(rampSeconds);
+    
     int numbOfBalls = 0;
     int bottomSensorLock = 1;
     int topSensorLock = 1;
@@ -36,14 +37,6 @@ public class collectorShooterSystem extends SubsystemBase
     double shooterSpeed = 0.1;
     Boolean isGettingBall = false;
 
-    // SmartDashboard.putBoolean("BottomSensor", bottomSensor.get());
-    // SmartDashboard.putBoolean("TopSensor", topSensor.get());
-    // SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
-    // SmartDashboard.putNumber("bottomSensorLock", bottomSensorLock);        
-    // SmartDashboard.putBoolean("isGettingBall", isGettingBall);  
-    // SmartDashboard.putNumber("Shooter Speed", shooterSpeed * 100); 
-
-    // @Override
     public void periodic() {
         //public void ballCounter(){
             //Call this every tick to count and move balls
@@ -56,7 +49,6 @@ public class collectorShooterSystem extends SubsystemBase
                 bottomSensorLock = 0;
                 isGettingBall = false;
             }
-        
                 if (topSensorLock == 0 && topSensor.get()) {
                     numbOfBalls --;
                     topSensorLock = 1;
@@ -64,12 +56,9 @@ public class collectorShooterSystem extends SubsystemBase
                 else if (topSensorLock == 1 && !topSensor.get()) {
                     topSensorLock = 0;
                 }
-
                 SmartDashboard.putNumber("Number Of Balls", numbOfBalls);    
                 SmartDashboard.putNumber("ShooterSpeed", shooterSpeed);    
                 SmartDashboard.putBoolean("IsGettingBall", isGettingBall);  
-
-    
     }
 
 
@@ -82,7 +71,6 @@ public class collectorShooterSystem extends SubsystemBase
     }
 
   public void shooterSpeedUp() {
-
     if (shooterSpeed < 1 && shooterSpeed >= 0.1) {
         
         shooterSpeed = shooterSpeed + 0.1;
@@ -90,11 +78,9 @@ public class collectorShooterSystem extends SubsystemBase
     else if (shooterSpeed >= 1.0){
     shooterSpeed = 1.0;
     }
-
   }
 
   public void shooterSpeedDowm() {
-
     if (shooterSpeed >= 1 || shooterSpeed > 0.1) {
     shooterSpeed = shooterSpeed - 0.1; }
   
@@ -107,9 +93,6 @@ public class collectorShooterSystem extends SubsystemBase
 //   else if (isChangingSpeed == 1) {
 //           isChangingSpeed = 0;
 //         }
-
-
-
 
     public void shootBalls() {
         _shooterMotorLeft.setIdleMode(IdleMode.kCoast);

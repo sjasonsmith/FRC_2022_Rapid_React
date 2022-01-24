@@ -3,7 +3,6 @@ package frc.robot;
 import frc.robot.subsystems.collectorShooterSystem;
 import frc.robot.subsystems.drivingSystem;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -55,7 +54,7 @@ private void configureButtonBindings() {
 
       new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 90).whenPressed(() -> _shooter.shooterSpeedUp());
 
-      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 270).whenPressed(() -> _shooter.shooterSpeedDowm());
+      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 270).whenPressed(() -> _shooter.shooterSpeedDown());
 
       new JoystickButton(driveStick, 6).whileHeld(() -> _shooter.shootBalls()).whenReleased(() -> _shooter.stopShooterMotors());
 

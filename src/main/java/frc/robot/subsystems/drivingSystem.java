@@ -4,15 +4,11 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import frc.robot.commands.driveJoystick;
 import frc.robot.commands.resetEncoders;
 
 public class drivingSystem extends SubsystemBase {
@@ -21,11 +17,15 @@ public class drivingSystem extends SubsystemBase {
     private final CANSparkMax _leftFrontCanSparkMax = new CANSparkMax((4), MotorType.kBrushless);
     private final CANSparkMax _rightBackCanSparkMax = new CANSparkMax((2), MotorType.kBrushless);
     private final CANSparkMax _rightFrontCanSparkMax = new CANSparkMax((3), MotorType.kBrushless);
+
     private final SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(_leftBackCanSparkMax, _leftFrontCanSparkMax);
     private final SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(_rightBackCanSparkMax, _rightFrontCanSparkMax);
+
     private final DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
+
     CANEncoder leftBack_encoder = _leftBackCanSparkMax.getEncoder();
     CANEncoder rightBack_encoder = _rightBackCanSparkMax.getEncoder();
+    
     double encoderInches = 0;
     int resetEncoders = 0;
     double kP, kI, kD; 
