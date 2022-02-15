@@ -1,12 +1,10 @@
 package frc.robot;
 
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.drivingSystem;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.button.Button;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -20,9 +18,22 @@ public class RobotContainer {
   Joystick driveStick = new Joystick(0);
 
   //Define Subsystems
-  private final drivingSystem _driving = new drivingSystem();
+  private final drivingSystem m_driving = new drivingSystem();
 
   public RobotContainer() {
+    // Set up the default command for the drivetrain.
+    // The controls are for field-oriented driving:
+    // Left stick Y axis -> forward and backwards movement
+    // Left stick X axis -> left and right movement
+    // Right stick X axis -> rotation
+    m_driving.setDefaultCommand(new DefaultDriveCommand(
+      m_driving,
+            () -> -modifyAxis(driveStick.getY()) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -modifyAxis(driveStick.getZ()) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -modifyAxis(driveStick.getZ()) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+    ));
+
+    // Configure the button bindings
     configureButtonBindings();
   }
 
@@ -30,4 +41,30 @@ public class RobotContainer {
 private void configureButtonBindings() {
 
   }
+
+  private static double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0.0) {
+        return (value - deadband) / (1.0 - deadband);
+      } else {
+        return (value + deadband) / (1.0 - deadband);
+      }
+    } else {
+      return 0.0;
+    }
+  }
+
+  private static double modifyAxis(double value) {
+    // Deadband
+    value = deadband(value, 0.05);
+
+    // Square the axis
+    value = Math.copySign(value * value, value);
+
+    return value;
+  }
+
+
+  
+
 }

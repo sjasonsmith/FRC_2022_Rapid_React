@@ -1,37 +1,190 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_CANCoder;
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.swervedrivespecialties.swervelib.SwerveModule;
+import frc.robot.Constants;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class drivingSystem extends SubsystemBase {
     
-    private final CANSparkMax _frontLeftDrive = new CANSparkMax((1), MotorType.kBrushless);
-    private final CANSparkMax _frontLeftSteer = new CANSparkMax((2), MotorType.kBrushless);
-    private final CANSparkMax _backLeftDrive = new CANSparkMax((3), MotorType.kBrushless);
-    private final CANSparkMax _backLeftSteer = new CANSparkMax((4), MotorType.kBrushless);
-    private final CANSparkMax _backRightDrive = new CANSparkMax((5), MotorType.kBrushless);
-    private final CANSparkMax _backRightSteer = new CANSparkMax((6), MotorType.kBrushless);
-    private final CANSparkMax _frontRightDrive = new CANSparkMax((7), MotorType.kBrushless);
-    private final CANSparkMax _frontRightSteer = new CANSparkMax((8), MotorType.kBrushless);
+    private CANSparkMax _frontLeftDrive = new CANSparkMax((Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
+    private CANSparkMax _frontLeftSteer = new CANSparkMax((Constants.FRONT_LEFT_MODULE_STEER_MOTOR), MotorType.kBrushless);
 
-    private WPI_CANCoder _frontLeftCanCoder = new WPI_CANCoder(0); //Front Left CanCoder At CAN Address 0
-    private WPI_CANCoder _backLeftCanCoder = new WPI_CANCoder(0); //Back Left CanCoder At CAN Address 0
-    private WPI_CANCoder _backRightCanCoder = new WPI_CANCoder(0); //Back Right CanCoder At CAN Address 0
-    private WPI_CANCoder _frontRightCanCoder = new WPI_CANCoder(0); //Front Right CanCoder At CAN Address 0 
+    private CANSparkMax _backLeftDrive = new CANSparkMax((Constants.BACK_LEFT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
+    private CANSparkMax _backLeftSteer = new CANSparkMax((Constants.BACK_LEFT_MODULE_STEER_MOTOR), MotorType.kBrushless);
+
+    private CANSparkMax _backRightDrive = new CANSparkMax((Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
+    private CANSparkMax _backRightSteer = new CANSparkMax((Constants.BACK_RIGHT_MODULE_STEER_MOTOR), MotorType.kBrushless);
+
+    private CANSparkMax _frontRightDrive = new CANSparkMax((Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
+    private CANSparkMax _frontRightSteer = new CANSparkMax((Constants.FRONT_RIGHT_MODULE_STEER_MOTOR), MotorType.kBrushless);
+
+    private WPI_CANCoder _frontLeftCanCoder = new WPI_CANCoder(Constants.FRONT_LEFT_MODULE_STEER_ENCODER); //Front Left CanCoder At CAN Address
+    private WPI_CANCoder _backLeftCanCoder = new WPI_CANCoder(Constants.BACK_LEFT_MODULE_STEER_ENCODER); //Back Left CanCoder At CAN Address
+    private WPI_CANCoder _backRightCanCoder = new WPI_CANCoder(Constants.BACK_RIGHT_MODULE_STEER_ENCODER); //Back Right CanCoder At CAN Address
+    private WPI_CANCoder _frontRightCanCoder = new WPI_CANCoder(Constants.FRONT_RIGHT_MODULE_STEER_ENCODER); //Front Right CanCoder At CAN Address
     
-    // double encoderInches = 0;
-
     public double _frontLeftEncoderRaw = _frontLeftCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
     public double _frontRightEncoderRaw = _frontRightCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
     public double _backLeftEncoderRaw = _backLeftCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
     public double _backRightEncoderRaw = _backRightCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
 
+    public static final double MAX_VOLTAGE = 12.0;  
+
+    public static final double MAX_VELOCITY_METERS_PER_SECOND = 6380.0 / 60.0 *
+    SdsModuleConfigurations.MK3_STANDARD.getDriveReduction() *
+    SdsModuleConfigurations.MK3_STANDARD.getWheelDiameter() * Math.PI;
+
+    //Define Modules
+
+    public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
+          Math.hypot(Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0);
+
+    private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+        //   Front left
+          new Translation2d(Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+          // Front right
+          new Translation2d(Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+          // Back left
+          new Translation2d(-Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+          // Back right
+          new Translation2d(-Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0)
+  );
+  
+    private final AHRS navxIMU = new AHRS(SerialPort.Port.kMXP); //Define NavX
+
+    //Initialize Swerve Modules
+
+    private final SwerveModule m_frontLeftModule;
+    private final SwerveModule m_frontRightModule;
+    private final SwerveModule m_backLeftModule;
+    private final SwerveModule m_backRightModule;
+
+    private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+
+    public drivingSystem() {
+        ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
+        // There are 4 methods you can call to create your swerve modules.
+    // The method you use depends on what motors you are using.
+    //
+    // Mk3SwerveModuleHelper.createFalcon500(...)
+    //   Your module has two Falcon 500s on it. One for steering and one for driving.
+    //
+    // Mk3SwerveModuleHelper.createNeo(...)  <--- What we want!
+    //   Your module has two NEOs on it. One for steering and one for driving.
+    //
+    // Mk3SwerveModuleHelper.createFalcon500Neo(...)
+    //   Your module has a Falcon 500 and a NEO on it. The Falcon 500 is for driving and the NEO is for steering.
+    //
+    // Mk3SwerveModuleHelper.createNeoFalcon500(...)
+    //   Your module has a NEO and a Falcon 500 on it. The NEO is for driving and the Falcon 500 is for steering.
+    //
+    // Similar helpers also exist for Mk4 modules using the Mk4SwerveModuleHelper class.
+    
+
+    m_frontLeftModule = Mk4SwerveModuleHelper.createNeo(
+        // This parameter is optional, but will allow you to see the current state of the module on the dashboard.
+        tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+            .withSize(2, 4)
+            .withPosition(0, 0),
+        // This can either be STANDARD or FAST depending on your gear configuration (This seems to only apply to mark 3's, an MK4 equiv is L3, closest anyway)
+        Mk4SwerveModuleHelper.GearRatio.L3,
+        // This is the ID of the drive motor
+        Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR,
+        // This is the ID of the steer motor
+        Constants.FRONT_LEFT_MODULE_STEER_MOTOR,
+        // This is the ID of the steer encoder
+        Constants.FRONT_LEFT_MODULE_STEER_ENCODER,
+        // This is how much the steer encoder is offset from true zero (In our case, zero is facing straight forward)
+        Constants.FRONT_LEFT_MODULE_STEER_OFFSET
+    );
+
+    // We will do the same for the other modules
+    m_frontRightModule = Mk4SwerveModuleHelper.createNeo(
+            tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+                    .withSize(2, 4)
+                    .withPosition(2, 0),
+            Mk4SwerveModuleHelper.GearRatio.L3,
+            Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR,
+            Constants.FRONT_RIGHT_MODULE_STEER_MOTOR,
+            Constants.FRONT_RIGHT_MODULE_STEER_ENCODER,
+            Constants.FRONT_RIGHT_MODULE_STEER_OFFSET
+    );
+
+    m_backLeftModule = Mk4SwerveModuleHelper.createNeo(
+            tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+                    .withSize(2, 4)
+                    .withPosition(4, 0),
+            Mk4SwerveModuleHelper.GearRatio.L3,
+            Constants.BACK_LEFT_MODULE_DRIVE_MOTOR,
+            Constants.BACK_LEFT_MODULE_STEER_MOTOR,
+            Constants.BACK_LEFT_MODULE_STEER_ENCODER,
+            Constants.BACK_LEFT_MODULE_STEER_OFFSET
+    );
+
+    m_backRightModule = Mk4SwerveModuleHelper.createNeo(
+            tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+                    .withSize(2, 4)
+                    .withPosition(6, 0),
+            Mk4SwerveModuleHelper.GearRatio.L3,
+            Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR,
+            Constants.BACK_RIGHT_MODULE_STEER_MOTOR,
+            Constants.BACK_RIGHT_MODULE_STEER_ENCODER,
+            Constants.BACK_RIGHT_MODULE_STEER_OFFSET
+    );
+
+  }
+    
+
     // @Override
     public void periodic() {
 
+        SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
+
+    m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[0].angle.getRadians());
+    m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
+    m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[2].angle.getRadians());
+    m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());       
     }
+
+    public void zeroGyroscope() {
+        // FIXME Uncomment if you are using a NavX
+       navxIMU.zeroYaw();
+      }
+
+    public Rotation2d getGyroscopeRotation() {
+    // FIXME Uncomment if you are using a NavX
+       if (navxIMU.isMagnetometerCalibrated()) {
+         // We will only get valid fused headings if the magnetometer is calibrated
+         return Rotation2d.fromDegrees(navxIMU.getFusedHeading());
+       }
+    
+       // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
+       return Rotation2d.fromDegrees(360.0 - navxIMU.getYaw());
+    
+    }
+    
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        m_chassisSpeeds = chassisSpeeds;
+    }
+    
+
 
     public void resetCanCoders() {
         _frontLeftCanCoder.setPosition(0.0);
@@ -39,6 +192,32 @@ public class drivingSystem extends SubsystemBase {
         _backRightCanCoder.setPosition(0.0);
         _backLeftCanCoder.setPosition(0.0);
     }
+
+    public void setDriveMotorsBrakeMode() {
+        _frontLeftDrive.setIdleMode(IdleMode.kBrake);
+        _frontLeftSteer.setIdleMode(IdleMode.kBrake);
+        _backLeftDrive.setIdleMode(IdleMode.kBrake);
+        _backLeftSteer.setIdleMode(IdleMode.kBrake);
+        _backRightDrive.setIdleMode(IdleMode.kBrake);
+        _backRightSteer.setIdleMode(IdleMode.kBrake);
+        _frontRightDrive.setIdleMode(IdleMode.kBrake);
+        _frontRightSteer.setIdleMode(IdleMode.kBrake);
+    }
+
+
+    public void setDriveMotorsCoastMode() {
+        _frontLeftDrive.setIdleMode(IdleMode.kCoast);
+        _frontLeftSteer.setIdleMode(IdleMode.kCoast);
+        _backLeftDrive.setIdleMode(IdleMode.kCoast);
+        _backLeftSteer.setIdleMode(IdleMode.kCoast);
+        _backRightDrive.setIdleMode(IdleMode.kCoast);
+        _backRightSteer.setIdleMode(IdleMode.kCoast);
+        _frontRightDrive.setIdleMode(IdleMode.kCoast);
+        _frontRightSteer.setIdleMode(IdleMode.kCoast);
+    }
+
+    
+
 
     public void resetOtherEncoders() {
 
