@@ -29,8 +29,8 @@ public class RobotContainer {
     m_driving.setDefaultCommand(new DefaultDriveCommand(
       m_driving,
             () -> -modifyAxis(driveStick.getY()) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(driveStick.getZ()) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(driveStick.getZ()) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+            () -> -modifyAxis(driveStick.getX()) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(driveStick.getZ()) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
 
     // Configure the button bindings
