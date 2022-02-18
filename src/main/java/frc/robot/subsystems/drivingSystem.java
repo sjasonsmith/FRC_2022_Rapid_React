@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -22,28 +18,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class drivingSystem extends SubsystemBase {
     
-    // private CANSparkMax _frontLeftDrive = new CANSparkMax((Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
-    // private CANSparkMax _frontLeftSteer = new CANSparkMax((Constants.FRONT_LEFT_MODULE_STEER_MOTOR), MotorType.kBrushless);
-
-    // private CANSparkMax _backLeftDrive = new CANSparkMax((Constants.BACK_LEFT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
-    // private CANSparkMax _backLeftSteer = new CANSparkMax((Constants.BACK_LEFT_MODULE_STEER_MOTOR), MotorType.kBrushless);
-
-    // private CANSparkMax _backRightDrive = new CANSparkMax((Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
-    // private CANSparkMax _backRightSteer = new CANSparkMax((Constants.BACK_RIGHT_MODULE_STEER_MOTOR), MotorType.kBrushless);
-
-    // private CANSparkMax _frontRightDrive = new CANSparkMax((Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR), MotorType.kBrushless);
-    // private CANSparkMax _frontRightSteer = new CANSparkMax((Constants.FRONT_RIGHT_MODULE_STEER_MOTOR), MotorType.kBrushless);
-
-    // private WPI_CANCoder _frontLeftCanCoder = new WPI_CANCoder(Constants.FRONT_LEFT_MODULE_STEER_ENCODER); //Front Left CanCoder At CAN Address
-    // private WPI_CANCoder _backLeftCanCoder = new WPI_CANCoder(Constants.BACK_LEFT_MODULE_STEER_ENCODER); //Back Left CanCoder At CAN Address
-    // private WPI_CANCoder _backRightCanCoder = new WPI_CANCoder(Constants.BACK_RIGHT_MODULE_STEER_ENCODER); //Back Right CanCoder At CAN Address
-    // private WPI_CANCoder _frontRightCanCoder = new WPI_CANCoder(Constants.FRONT_RIGHT_MODULE_STEER_ENCODER); //Front Right CanCoder At CAN Address
-    
-    // public double _frontLeftEncoderRaw = _frontLeftCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
-    // public double _frontRightEncoderRaw = _frontRightCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
-    // public double _backLeftEncoderRaw = _backLeftCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
-    // public double _backRightEncoderRaw = _backRightCanCoder.getPosition(); //Get the (NOT ABSOLUTE) Position of the CanCoder
-
     public static final double MAX_VOLTAGE = 12.0;  
 
     public static final double MAX_VELOCITY_METERS_PER_SECOND = 6380.0 / 60.0 *
@@ -183,42 +157,7 @@ public class drivingSystem extends SubsystemBase {
     public void drive(ChassisSpeeds chassisSpeeds) {
         m_chassisSpeeds = chassisSpeeds;
     }
-    
-
-
-    // public void resetCanCoders() {
-    //     _frontLeftCanCoder.setPosition(0.0);
-    //     _frontRightCanCoder.setPosition(0.0);
-    //     _backRightCanCoder.setPosition(0.0);
-    //     _backLeftCanCoder.setPosition(0.0);
-    // }
-
-    // public void setDriveMotorsBrakeMode() {
-    //     _frontLeftDrive.setIdleMode(IdleMode.kBrake);
-    //     _frontLeftSteer.setIdleMode(IdleMode.kBrake);
-    //     _backLeftDrive.setIdleMode(IdleMode.kBrake);
-    //     _backLeftSteer.setIdleMode(IdleMode.kBrake);
-    //     _backRightDrive.setIdleMode(IdleMode.kBrake);
-    //     _backRightSteer.setIdleMode(IdleMode.kBrake);
-    //     _frontRightDrive.setIdleMode(IdleMode.kBrake);
-    //     _frontRightSteer.setIdleMode(IdleMode.kBrake);
-    // }
-
-
-    // public void setDriveMotorsCoastMode() {
-    //     _frontLeftDrive.setIdleMode(IdleMode.kCoast);
-    //     _frontLeftSteer.setIdleMode(IdleMode.kCoast);
-    //     _backLeftDrive.setIdleMode(IdleMode.kCoast);
-    //     _backLeftSteer.setIdleMode(IdleMode.kCoast);
-    //     _backRightDrive.setIdleMode(IdleMode.kCoast);
-    //     _backRightSteer.setIdleMode(IdleMode.kCoast);
-    //     _frontRightDrive.setIdleMode(IdleMode.kCoast);
-    //     _frontRightSteer.setIdleMode(IdleMode.kCoast);
-    // }
-
-    
-
-
+  
     public void resetOtherEncoders() {
 
     }
