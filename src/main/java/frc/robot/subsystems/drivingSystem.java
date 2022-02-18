@@ -1,114 +1,175 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.kauailabs.navx.frc.AHRS;
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.swervedrivespecialties.swervelib.SwerveModule;
+import frc.robot.Constants;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.resetEncoders;
 
 public class drivingSystem extends SubsystemBase {
     
-    private final CANSparkMax _leftBackCanSparkMax = new CANSparkMax((1), MotorType.kBrushless);
-    private final CANSparkMax _leftFrontCanSparkMax = new CANSparkMax((4), MotorType.kBrushless);
-    private final CANSparkMax _rightBackCanSparkMax = new CANSparkMax((2), MotorType.kBrushless);
-    private final CANSparkMax _rightFrontCanSparkMax = new CANSparkMax((3), MotorType.kBrushless);
+    public static final double MAX_VOLTAGE = 12.0;  
 
-    private final SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(_leftBackCanSparkMax, _leftFrontCanSparkMax);
-    private final SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(_rightBackCanSparkMax, _rightFrontCanSparkMax);
+    public static final double MAX_VELOCITY_METERS_PER_SECOND = 6380.0 / 60.0 *
+      SdsModuleConfigurations.MK3_STANDARD.getDriveReduction() *
+      SdsModuleConfigurations.MK3_STANDARD.getWheelDiameter() * Math.PI;
 
-    private final DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
+    //Define Modules
 
-    CANEncoder leftBack_encoder = _leftBackCanSparkMax.getEncoder();
-    CANEncoder rightBack_encoder = _rightBackCanSparkMax.getEncoder();
+    public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
+          Math.hypot(Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0);
+
+    private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+        //   Front left
+          new Translation2d(Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+          // Front right
+          new Translation2d(Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+          // Back left
+          new Translation2d(-Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+          // Back right
+          new Translation2d(-Constants.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -Constants.DRIVETRAIN_WHEELBASE_METERS / 2.0)
+  );
+  
+    private final AHRS navxIMU = new AHRS(SerialPort.Port.kMXP); //Define NavX
+
+    //Initialize Swerve Modules
+
+    private final SwerveModule m_frontLeftModule;
+    private final SwerveModule m_frontRightModule;
+    private final SwerveModule m_backLeftModule;
+    private final SwerveModule m_backRightModule;
+
+    private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+
+    public drivingSystem() {
+        ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
+        // There are 4 methods you can call to create your swerve modules.
+    // The method you use depends on what motors you are using.
+    //
+    // Mk3SwerveModuleHelper.createFalcon500(...)
+    //   Your module has two Falcon 500s on it. One for steering and one for driving.
+    //
+    // Mk3SwerveModuleHelper.createNeo(...)  <--- What we want!
+    //   Your module has two NEOs on it. One for steering and one for driving.
+    //
+    // Mk3SwerveModuleHelper.createFalcon500Neo(...)
+    //   Your module has a Falcon 500 and a NEO on it. The Falcon 500 is for driving and the NEO is for steering.
+    //
+    // Mk3SwerveModuleHelper.createNeoFalcon500(...)
+    //   Your module has a NEO and a Falcon 500 on it. The NEO is for driving and the Falcon 500 is for steering.
+    //
+    // Similar helpers also exist for Mk4 modules using the Mk4SwerveModuleHelper class.
+
     
-    double encoderInches = 0;
-    int resetEncoders = 0;
-    double kP, kI, kD; 
-    edu.wpi.first.math.controller.PIDController  pid = new edu.wpi.first.math.controller.PIDController(kP, kI, kD);
+    m_frontLeftModule = Mk4iSwerveModuleHelper.createNeo(
+        // This parameter is optional, but will allow you to see the current state of the module on the dashboard.
+        tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+            .withSize(2, 4)
+            .withPosition(0, 0),
+        // This can either be STANDARD or FAST depending on your gear configuration (This seems to only apply to mark 3's, an MK4 equiv is L3, closest anyway)
+        Mk4iSwerveModuleHelper.GearRatio.L2,
+        // This is the ID of the drive motor
+        Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR,
+        // This is the ID of the steer motor
+        Constants.FRONT_LEFT_MODULE_STEER_MOTOR,
+        // This is the ID of the steer encoder
+        Constants.FRONT_LEFT_MODULE_STEER_ENCODER,
+        // This is how much the steer encoder is offset from true zero (In our case, zero is facing straight forward)
+        Constants.FRONT_LEFT_MODULE_STEER_OFFSET
+    );
+
+    // We will do the same for the other modules
+    m_frontRightModule = Mk4iSwerveModuleHelper.createNeo(
+            tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+                    .withSize(2, 4)
+                    .withPosition(2, 0),
+            Mk4iSwerveModuleHelper.GearRatio.L2,
+            Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR,
+            Constants.FRONT_RIGHT_MODULE_STEER_MOTOR,
+            Constants.FRONT_RIGHT_MODULE_STEER_ENCODER,
+            Constants.FRONT_RIGHT_MODULE_STEER_OFFSET
+    );
+
+    m_backLeftModule = Mk4iSwerveModuleHelper.createNeo(
+            tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+                    .withSize(2, 4)
+                    .withPosition(4, 0),
+            Mk4iSwerveModuleHelper.GearRatio.L2,
+            Constants.BACK_LEFT_MODULE_DRIVE_MOTOR,
+            Constants.BACK_LEFT_MODULE_STEER_MOTOR,
+            Constants.BACK_LEFT_MODULE_STEER_ENCODER,
+            Constants.BACK_LEFT_MODULE_STEER_OFFSET
+    );
+
+    m_backRightModule = Mk4iSwerveModuleHelper.createNeo(
+            tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+                    .withSize(2, 4)
+                    .withPosition(6, 0),
+            Mk4iSwerveModuleHelper.GearRatio.L2,
+            Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR,
+            Constants.BACK_RIGHT_MODULE_STEER_MOTOR,
+            Constants.BACK_RIGHT_MODULE_STEER_ENCODER,
+            Constants.BACK_RIGHT_MODULE_STEER_OFFSET
+    );
+
+  }
     
-
-    // @Override
-    // public void initialize() {
-    //     leftBack_encoder.setPosition(0.0);
-    //     rightBack_encoder.setPosition(0.0);
-    //     encoderInches = 0;
-    // }
-
 
     // @Override
     public void periodic() {
-       
-        if (resetEncoders == 0) {
-            resetEncoders();
-            resetEncoders = 1;
-        }
 
-        SmartDashboard.putNumber("Left Encoder RAW", leftBack_encoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder RAW", rightBack_encoder.getPosition());
+        SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
 
-    kP = SmartDashboard.getNumber("P", 0);
-    SmartDashboard.putNumber("Internal P", kP);
-
-    kI = SmartDashboard.getNumber("I", 0);
-    SmartDashboard.putNumber("Internal I", kI);
-
-    kD = SmartDashboard.getNumber("D", 0);
-    SmartDashboard.putNumber("Internal D", kD);
-
-    SmartDashboard.putNumber("Left Encoder_Graph", leftBack_encoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder_Graph", rightBack_encoder.getPosition());
-
-    encoderInches = ((rightBack_encoder.getPosition() * Math.PI) / 1.5) * -1;
-    SmartDashboard.putNumber("Right Encoder Inches Traveled", encoderInches);
-
-
-
+    m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[0].angle.getRadians());
+    m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
+    m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[2].angle.getRadians());
+    m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());       
     }
 
+    public void zeroGyroscope() {
+        // FIXME Uncomment if you are using a NavX
+       navxIMU.zeroYaw();
+      }
+
+    public Rotation2d getGyroscopeRotation() {
+    // FIXME Uncomment if you are using a NavX
+       if (navxIMU.isMagnetometerCalibrated()) {
+         // We will only get valid fused headings if the magnetometer is calibrated
+         return Rotation2d.fromDegrees(navxIMU.getFusedHeading());
+       }
     
+       // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
+       return Rotation2d.fromDegrees(360.0 - navxIMU.getYaw());
+    
+    }
+    
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        m_chassisSpeeds = chassisSpeeds;
+    }
+  
+    public void resetOtherEncoders() {
 
-
-
-    public void setDriveParams(double forward, double rotate, Boolean squareInput) {
-        _leftBackCanSparkMax.setIdleMode(IdleMode.kBrake);
-        _leftFrontCanSparkMax.setIdleMode(IdleMode.kBrake);
-        _rightBackCanSparkMax.setIdleMode(IdleMode.kBrake);
-        _rightFrontCanSparkMax.setIdleMode(IdleMode.kBrake);    
-        
-        m_Drive.arcadeDrive(forward * 1.5, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), squareInput);
-        SmartDashboard.putNumber("JOY", forward);    
-        
     }
 
-    public void resetEncoders() {
-        leftBack_encoder.setPosition(0.0);
-        rightBack_encoder.setPosition(0.0);
-        encoderInches = 0;
-    }
-
-    //Add encoder data processing, so Encoder Ticks -> Shaft Rotations -> Gearbox rotations -> Inches Traveled
-
-    //Aprox 9.5 'ticks' is one revolution on the Wheel
-
-    //5 Inch Wheel at one revolution is 5*pi is inches? So in one rotation it would be 15.7 inches 
     //Circumfrence (Distance Traveled By Rotation) is C=d*Pi
 
     
 
-        public void driveDistance(double setpoint) {
-            SmartDashboard.putBoolean("driveDistance", true);
-            m_Drive.arcadeDrive(pid.calculate(encoderInches, setpoint), 0);
-            
-        }
+    public void driveDistance(double setpoint) {
+    }
 
-        public void stopAllMotors() {
-            SmartDashboard.putBoolean("driveDistance", false);
-            m_Drive.arcadeDrive(0, 0);
-        }
+    public void stopAllMotors() {
+    }
 
 }

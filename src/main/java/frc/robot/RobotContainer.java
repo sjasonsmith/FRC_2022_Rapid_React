@@ -1,13 +1,10 @@
 package frc.robot;
 
-import frc.robot.subsystems.collectorShooterSystem;
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.drivingSystem;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.button.Button;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -21,43 +18,58 @@ public class RobotContainer {
   Joystick driveStick = new Joystick(0);
 
   //Define Subsystems
-  private final collectorShooterSystem _shooter = new collectorShooterSystem();
-  private final drivingSystem _driving = new drivingSystem();
+  private final drivingSystem m_driving = new drivingSystem();
 
   public RobotContainer() {
-    configureButtonBindings();
-
-    // _driving.setDefaultCommand(new driveJoystick());
-
-
-
-    _driving.setDefaultCommand(new RunCommand(() -> _driving.setDriveParams((-driveStick.getRawAxis(1) * 0.5), (driveStick.getRawAxis(4) * 0.5), true), _driving));
+    // Set up the default command for the drivetrain.
+    // The controls are for field-oriented driving:
+    // Stick Y axis -> forward and backwards movement
+    // Stick X axis -> left and right movement
+    // Rotate Z axis -> rotation
     
+
+    m_driving.setDefaultCommand(new DefaultDriveCommand(
+      m_driving,
+            () -> modifyAxis(driveStick.getRawAxis(1)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(driveStick.getRawAxis(0)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+    ));
+
+    // Configure the button bindings
+    configureButtonBindings();
   }
 
 
 private void configureButtonBindings() {
 
-      new JoystickButton(driveStick, 5).whileHeld(() -> _shooter.collectBalls()).whenReleased(() -> _shooter.stopAllMotors());
-
-      new JoystickButton(driveStick, 3).whileHeld(() -> _driving.driveDistance(10)).whenReleased(() -> _driving.stopAllMotors());
-
-
-      // Lift And Lower Collector
-      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 0).whenPressed(() -> _shooter.liftCollector()).whenReleased(() -> _shooter.stopLiftMotors());
-    
-      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 180).whenPressed(() -> _shooter.lowerCollector()).whenReleased(() -> _shooter.stopLiftMotors());
-
-
-      // shootButton = new JoystickButton(driveStick, 6);
-      // Shooter
-
-      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 90).whenPressed(() -> _shooter.shooterSpeedUp());
-
-      new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 270).whenPressed(() -> _shooter.shooterSpeedDown());
-
-      new JoystickButton(driveStick, 6).whileHeld(() -> _shooter.shootBalls()).whenReleased(() -> _shooter.stopShooterMotors());
-
-
   }
+
+  private static double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0.0) {
+        return (value - deadband) / (1.0 - deadband);
+      } else {
+        return (value + deadband) / (1.0 - deadband);
+      }
+    } else {
+      return 0.0;
+    }
+  }
+
+  private static double modifyAxis(double value) {
+    // Deadband
+    value = deadband(value, 0.15);
+
+    // Square the axis
+    value = (value * value * value);
+    
+    //Limit to 50%
+    value = value * 0.5;
+
+    return value;
+  }
+
+
+  
+
 }
