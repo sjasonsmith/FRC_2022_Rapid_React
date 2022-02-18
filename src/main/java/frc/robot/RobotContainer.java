@@ -23,9 +23,11 @@ public class RobotContainer {
   public RobotContainer() {
     // Set up the default command for the drivetrain.
     // The controls are for field-oriented driving:
-    // Left stick Y axis -> forward and backwards movement
-    // Left stick X axis -> left and right movement
-    // Right stick X axis -> rotation
+    // Stick Y axis -> forward and backwards movement
+    // Stick X axis -> left and right movement
+    // Rotate Z axis -> rotation
+    
+
     m_driving.setDefaultCommand(new DefaultDriveCommand(
       m_driving,
             () -> modifyAxis(driveStick.getY()) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
@@ -56,10 +58,13 @@ private void configureButtonBindings() {
 
   private static double modifyAxis(double value) {
     // Deadband
-    value = deadband(value, 0.05);
+    value = deadband(value, 0.15);
 
     // Square the axis
-    value = Math.copySign(value * value, value);
+    value = (value * value * value);
+    
+    //Limit to 50%
+    value = value * 0.5;
 
     return value;
   }
