@@ -5,6 +5,7 @@ import frc.robot.subsystems.drivingSystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -34,6 +35,8 @@ public class RobotContainer {
             () -> modifyAxis(driveStick.getRawAxis(0)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
             () -> -modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
+
+    new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
 
     // Configure the button bindings
     configureButtonBindings();
