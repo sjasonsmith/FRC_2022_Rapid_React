@@ -2,9 +2,8 @@ package frc.robot;
 
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.drivingSystem;
-import edu.wpi.first.wpilibj.GenericHID;
+import frc.robot.subsystems.shooterSystem;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /*
@@ -21,6 +20,8 @@ public class RobotContainer {
   //Define Subsystems
   private final drivingSystem m_driving = new drivingSystem();
 
+  private final shooterSystem m_shooting = new shooterSystem();
+
   public RobotContainer() {
     // Set up the default command for the drivetrain.
     // The controls are for field-oriented driving:
@@ -36,14 +37,24 @@ public class RobotContainer {
             () -> -modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
 
+
+    //Zero Gyroscope as a just in case
     new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
+
+    //Shoot Forward At 75%
+    new JoystickButton(driveStick, 1).whenPressed(() -> m_shooting.runShooter(0.75));
+
+
+    //Shoot Backwards At 75%
+    new JoystickButton(driveStick, 1).whenPressed(() -> m_shooting.runShooter(-0.75));
+
 
     // Configure the button bindings
     configureButtonBindings();
   }
 
 
-private void configureButtonBindings() {
+  private void configureButtonBindings() {
 
   }
 
