@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {
 
-  Joystick driveStick = new Joystick(0);
+  Joystick driveStick = new Joystick(0); //Should be a logitech F310, right USB
+  Joystick commandStick = new Joystick(1); //Should be a Logitech Extreme 3D pro.
 
   //Define Subsystems
   private final drivingSystem m_driving = new drivingSystem();
@@ -28,6 +29,7 @@ public class RobotContainer {
     // Stick Y axis -> forward and backwards movement
     // Stick X axis -> left and right movement
     // Rotate Z axis -> rotation
+
     
 
     m_driving.setDefaultCommand(new DefaultDriveCommand(
@@ -42,11 +44,17 @@ public class RobotContainer {
     new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
 
     //Shoot Forward At 75%
-    new JoystickButton(driveStick, 1).whenPressed(() -> m_shooting.runShooter(0.75));
+    new JoystickButton(commandStick, 1).whenPressed(() -> m_shooting.runShooter(0.75)).whenReleased(() -> m_shooting.runShooter(0.0));
 
 
     //Shoot Backwards At 75%
-    new JoystickButton(driveStick, 1).whenPressed(() -> m_shooting.runShooter(-0.75));
+    new JoystickButton(commandStick, 7).whenPressed(() -> m_shooting.runShooter(-0.75)).whenReleased(() -> m_shooting.runShooter(0.0));
+
+    // When DPAD-UP is pressed run the collector up
+    new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 0).whenPressed(() -> m_shooting.moveShooter(true)).whenReleased(() -> m_shooting.stopShooter());
+
+    // When DPAD-DOWN is pressed run the collector down
+    new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 270).whenPressed(() -> m_shooting.moveShooter(false)).whenReleased(() -> m_shooting.stopShooter());
 
 
     // Configure the button bindings
