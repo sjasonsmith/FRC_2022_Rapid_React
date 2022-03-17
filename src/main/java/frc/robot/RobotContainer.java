@@ -38,31 +38,31 @@ public class RobotContainer {
             () -> modifyAxis(driveStick.getRawAxis(0)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
             () -> -modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
-
-
-    //Zero Gyroscope as a just in case
-    new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
-
-    //Shoot Forward At 75%
-    new JoystickButton(commandStick, 1).whenPressed(() -> m_shooting.runShooter(0.75)).whenReleased(() -> m_shooting.runShooter(0.0));
-
-
-    //Shoot Backwards At 75%
-    new JoystickButton(commandStick, 7).whenPressed(() -> m_shooting.runShooter(-0.75)).whenReleased(() -> m_shooting.runShooter(0.0));
-
-    // When DPAD-UP is pressed run the collector up
-    new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 0).whenPressed(() -> m_shooting.moveShooter(true)).whenReleased(() -> m_shooting.stopShooter());
-
-    // When DPAD-DOWN is pressed run the collector down
-    new edu.wpi.first.wpilibj2.command.button.POVButton(driveStick, 270).whenPressed(() -> m_shooting.moveShooter(false)).whenReleased(() -> m_shooting.stopShooter());
-
-
     // Configure the button bindings
     configureButtonBindings();
   }
 
 
   private void configureButtonBindings() {
+    //Zero Gyroscope as a just in case
+    new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
+
+    //Shoot Forward At 75%
+    new JoystickButton(commandStick, 1).whenPressed(() -> m_shooting.runShooter(1)).whenReleased(() -> m_shooting.stopShooter());
+    // new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
+
+    // When DPAD-UP is pressed run the collector up
+    new JoystickButton(driveStick, 4).whenPressed(() -> m_shooting.moveCollector(false)).whenReleased(() -> m_shooting.stopCollectorMovement());
+    // ==VERIFY BUTTON MAPPINGS!!!==
+    // When DPAD-DOWN is pressed run the collector down
+    new JoystickButton(driveStick, 3).whenPressed(() -> m_shooting.moveCollector(true)).whenReleased(() -> m_shooting.stopCollectorMovement());
+
+    // Collect
+    new JoystickButton(driveStick, 1).whenPressed(() -> m_shooting.collect(true)).whenReleased(() -> m_shooting.stopCollectorPower());
+
+    // Collect, but backwards...
+
+    new JoystickButton(driveStick, 2).whenPressed(() -> m_shooting.collect(false)).whenReleased(() -> m_shooting.stopCollectorPower());
 
   }
 

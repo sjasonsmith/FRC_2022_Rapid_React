@@ -14,6 +14,7 @@ package frc.robot;
  */
 public final class Constants {
 
+    // Swerve Drive
     //Copy and pasted from https://github.com/SwerveDriveSpecialties/swerve-template/blob/dacd55949122576615ad8df77131aae2feb29d2c/src/main/java/frc/robot/Constants.java
 
         /**
@@ -52,5 +53,16 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 11; // FIXME Set back right steer encoder ID
     
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(241); // FIXME Measure and set back right steer offset
-    
+ 
+    // CAN ID's
+
+    public static final int collectorPowerCanID = 26;
+    public static final int shooterPowerCanID = 27;
+    public static final int shooterAssistCanID = 28;
+    public static final int collectorMovementCanID = 25;
+
+    // Speeds
+    public static final double shooterAssistSpeed = 0.75;
+    public static final double collectorMovementSpeed = 0.95;
+    public static final double collectorSpeed = 0.5;
 }
