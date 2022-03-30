@@ -57,7 +57,6 @@ public class shooterSystem extends SubsystemBase {
 
             // // IF NOW (5MS) - startTime (0MS) is greater than 0.5 then run the shooter
             // if (System.currentTimeMillis() - startTime > (1.5 * 1000)) {
-                _shooterAssist.set(Constants.shooterAssistSpeed);
         //     }
         //     else {
         //         _shooterAssist.set(0.0);
@@ -66,8 +65,15 @@ public class shooterSystem extends SubsystemBase {
         // }
     }
 
+    public void runShooterAssist() {
+        _shooterAssist.set(Constants.shooterAssistSpeed);
+    }
+
     public void stopShooter() {
         _shooterPower.set(0.0);
+    }
+
+    public void stopAssist() {
         _shooterAssist.set(0.0);
     }
     

@@ -60,9 +60,12 @@ public final class Constants {
     public static final int shooterPowerCanID = 27;
     public static final int shooterAssistCanID = 28;
     public static final int collectorMovementCanID = 25;
+    public static final int leftLiftMotorCanID = 35;
+    public static final int rightLiftMotorCanID = 37;
 
     // Speeds
     public static final double shooterAssistSpeed = 0.75;
     public static final double collectorMovementSpeed = 0.95;
     public static final double collectorSpeed = 0.5;
+    public static final double liftArmSpeed = 0.40;
 }

@@ -2,9 +2,11 @@ package frc.robot;
 
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.drivingSystem;
+import frc.robot.subsystems.liftSystem;
 import frc.robot.subsystems.shooterSystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -22,6 +24,8 @@ public class RobotContainer {
   private final drivingSystem m_driving = new drivingSystem();
 
   private final shooterSystem m_shooting = new shooterSystem();
+
+  private final liftSystem m_lifting = new liftSystem();
 
   public RobotContainer() {
     // Set up the default command for the drivetrain.
@@ -48,8 +52,10 @@ public class RobotContainer {
     new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
 
     //Shoot Forward At 75%
-    new JoystickButton(commandStick, 1).whenPressed(() -> m_shooting.runShooter(1)).whenReleased(() -> m_shooting.stopShooter());
+    new JoystickButton(commandStick, 1).whenPressed(() -> m_shooting.runShooter(0.99)).whenReleased(() -> m_shooting.stopShooter());
     // new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
+    new JoystickButton(driveStick, 6).whenPressed(() -> m_shooting.runShooter(0.99)).whenReleased(() -> m_shooting.stopShooter());
+    new JoystickButton(driveStick, 5).whenPressed(() -> m_shooting.runShooterAssist()).whenReleased(() -> m_shooting.stopAssist());
 
     // When DPAD-UP is pressed run the collector up
     new JoystickButton(driveStick, 4).whenPressed(() -> m_shooting.moveCollector(false)).whenReleased(() -> m_shooting.stopCollectorMovement());
@@ -60,9 +66,17 @@ public class RobotContainer {
     // Collect
     new JoystickButton(driveStick, 1).whenPressed(() -> m_shooting.collect(true)).whenReleased(() -> m_shooting.stopCollectorPower());
 
+
+    
     // Collect, but backwards...
 
     new JoystickButton(driveStick, 2).whenPressed(() -> m_shooting.collect(false)).whenReleased(() -> m_shooting.stopCollectorPower());
+
+
+    // Lift Arms!
+
+    new POVButton(driveStick, 0).whenPressed(() -> m_lifting.liftArmsUp()).whenReleased(() -> m_lifting.stopArms());
+    new POVButton(driveStick, 180).whenPressed(() -> m_lifting.liftArmsDown()).whenReleased(() -> m_lifting.stopArms());
 
   }
 
