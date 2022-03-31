@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private final drivingSystem m_driving = new drivingSystem();
+  // private final drivingSystem m_driving = new drivingSystem();
 
 
   /**
@@ -84,7 +84,7 @@ public class Robot extends TimedRobot {
     }
 
     // Zero Gyroscope as soon as teleop starts, move to autonomous when that works.
-    m_driving.zeroGyroscope();
+    m_robotContainer.m_driving.zeroGyroscope();
   }
 
   /** This function is called periodically during operator control. */

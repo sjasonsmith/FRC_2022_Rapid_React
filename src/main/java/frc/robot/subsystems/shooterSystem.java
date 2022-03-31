@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class shooterSystem extends SubsystemBase {
-    
     private CANSparkMax _collectorPower = new CANSparkMax(Constants.collectorPowerCanID, MotorType.kBrushless);
 
     private CANSparkMax _shooterPower = new CANSparkMax(Constants.shooterPowerCanID, MotorType.kBrushless);
@@ -59,7 +58,7 @@ public class shooterSystem extends SubsystemBase {
             // if (System.currentTimeMillis() - startTime > (1.5 * 1000)) {
         //     }
         //     else {
-        //         _shooterAssist.set(0.0);
+                // _shooterAssist.set(0.0);
         //     }
 
         // }
@@ -123,18 +122,18 @@ public class shooterSystem extends SubsystemBase {
     public void moveCollector(boolean direction) {
         
         if (direction) {
-            _collectorMovement.set(ControlMode.PercentOutput, Constants.collectorMovementSpeed);
+            // _collectorMovement.set(ControlMode.PercentOutput, Constants.collectorMovementSpeed);
         }
         else if (!direction) {
-            _collectorMovement.set(ControlMode.PercentOutput, -Constants.collectorMovementSpeed);
+            // _collectorMovement.set(ControlMode.PercentOutput, -Constants.collectorMovementSpeed);
         }
         else {
-            _collectorMovement.set(ControlMode.PercentOutput, 0.0);
+            // _collectorMovement.set(ControlMode.PercentOutput, 0.0);
         }
     }
 
     public void stopCollectorMovement() {
-        _collectorMovement.set(ControlMode.PercentOutput, 0.0);
+        // _collectorMovement.set(ControlMode.PercentOutput, 0.0);
     }
 
     // Collect forward (true) / reject collect (false)
@@ -142,18 +141,18 @@ public class shooterSystem extends SubsystemBase {
 
 
         if (direction) {
-            _collectorPower.set(Constants.collectorSpeed);
+            // _collectorPower.set(Constants.collectorSpeed);
         }
         else if (!direction) {
-            _collectorPower.set(-Constants.collectorSpeed);
+            // _collectorPower.set(-Constants.collectorSpeed);
         }
         else {
-            _collectorPower.set(0.0);
+            // _collectorPower.set(0.0);
         }
     }
 
     public void stopCollectorPower() {
-        _collectorPower.set(0.0);
+        // _collectorPower.set(0.0);
     }
 
 }

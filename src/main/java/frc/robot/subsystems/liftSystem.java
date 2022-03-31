@@ -7,20 +7,20 @@ import frc.robot.Constants;
 
 public class liftSystem extends SubsystemBase {
     
-    private CANSparkMax _leftLiftMotor = new CANSparkMax(Constants.leftLiftMotorCanID, MotorType.kBrushless);
+    // private CANSparkMax _leftLiftMotor = new CANSparkMax(Constants.leftLiftMotorCanID, MotorType.kBrushless);
 
     // private CANSparkMax _rightLiftMotor = new CANSparkMax(Constants.rightLiftMotorCanID, MotorType.kBrushless);
 
     public void liftArmsUp() {
-       _leftLiftMotor.set(Constants.liftArmSpeed); 
+    //    _leftLiftMotor.set(Constants.liftArmSpeed); 
     }
 
     public void liftArmsDown() {
-        _leftLiftMotor.set(-Constants.liftArmSpeed); 
+        // _leftLiftMotor.set(-Constants.liftArmSpeed); 
     }
 
     public void stopArms() {
-        _leftLiftMotor.set(0); 
+        // _leftLiftMotor.set(0); 
     }
 
 

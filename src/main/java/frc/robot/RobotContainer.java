@@ -21,7 +21,7 @@ public class RobotContainer {
   Joystick commandStick = new Joystick(1); //Should be a Logitech Extreme 3D pro.
 
   //Define Subsystems
-  private final drivingSystem m_driving = new drivingSystem();
+  public final drivingSystem m_driving = new drivingSystem();
 
   private final shooterSystem m_shooting = new shooterSystem();
 
