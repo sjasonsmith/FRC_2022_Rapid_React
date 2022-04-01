@@ -52,9 +52,8 @@ public class RobotContainer {
     new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
 
     //Shoot Forward At 75%
-    new JoystickButton(commandStick, 1).whenPressed(() -> m_shooting.runShooter(0.99)).whenReleased(() -> m_shooting.stopShooter());
-    // new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
-    new JoystickButton(driveStick, 6).whenPressed(() -> m_shooting.runShooter(0.99)).whenReleased(() -> m_shooting.stopShooter());
+    new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
+    new JoystickButton(driveStick, 6).whenPressed(() -> m_shooting.runShooter(0.99)).whenReleased(() -> m_shooting.stopSystem());
     new JoystickButton(driveStick, 5).whenPressed(() -> m_shooting.runShooterAssist()).whenReleased(() -> m_shooting.stopAssist());
 
     // When DPAD-UP is pressed run the collector up

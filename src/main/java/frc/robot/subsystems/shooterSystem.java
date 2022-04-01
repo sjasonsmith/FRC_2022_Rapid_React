@@ -8,6 +8,7 @@ import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -21,7 +22,7 @@ public class shooterSystem extends SubsystemBase {
 
     private TalonSRX _collectorMovement = new TalonSRX (Constants.collectorMovementCanID);
 
-    private double startTime;
+    private Timer shootingTimer = new Timer();
 
     // Define the I2C Port
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
@@ -44,24 +45,21 @@ public class shooterSystem extends SubsystemBase {
 
     public void runShooter(double shooterSpeed) {
 
-        // Experimenting with timing.
-        // // The time is 0MS
-        // startTime = System.currentTimeMillis(); 
+        shootingTimer.reset();
+        shootingTimer.start();
 
-        // boolean isTimeSet = true;
+        _shooterPower.set(-shooterSpeed);
+        runShooterTimerCall();
+    }
 
-        // while (isTimeSet) {
-
-            _shooterPower.set(-shooterSpeed);
-
-            // // IF NOW (5MS) - startTime (0MS) is greater than 0.5 then run the shooter
-            // if (System.currentTimeMillis() - startTime > (1.5 * 1000)) {
-        //     }
-        //     else {
-                // _shooterAssist.set(0.0);
-        //     }
-
-        // }
+    public void runShooterTimerCall() {
+        // IF NOW (5MS) - startTime (0MS) is greater than 0.5 then run the shooter
+        if (shootingTimer.get() > 3) {
+            _shooterAssist.set(Constants.shooterAssistSpeed);
+        }
+        else {
+            runShooterTimerCall();;
+        }
     }
 
     public void runShooterAssist() {
@@ -73,6 +71,11 @@ public class shooterSystem extends SubsystemBase {
     }
 
     public void stopAssist() {
+        _shooterAssist.set(0.0);
+    }
+
+    public void stopSystem() {
+        _shooterPower.set(0.0);
         _shooterAssist.set(0.0);
     }
     
@@ -122,18 +125,18 @@ public class shooterSystem extends SubsystemBase {
     public void moveCollector(boolean direction) {
         
         if (direction) {
-            // _collectorMovement.set(ControlMode.PercentOutput, Constants.collectorMovementSpeed);
+            _collectorMovement.set(ControlMode.PercentOutput, Constants.collectorMovementSpeed);
         }
         else if (!direction) {
-            // _collectorMovement.set(ControlMode.PercentOutput, -Constants.collectorMovementSpeed);
+            _collectorMovement.set(ControlMode.PercentOutput, -Constants.collectorMovementSpeed);
         }
         else {
-            // _collectorMovement.set(ControlMode.PercentOutput, 0.0);
+            _collectorMovement.set(ControlMode.PercentOutput, 0.0);
         }
     }
 
     public void stopCollectorMovement() {
-        // _collectorMovement.set(ControlMode.PercentOutput, 0.0);
+        _collectorMovement.set(ControlMode.PercentOutput, 0.0);
     }
 
     // Collect forward (true) / reject collect (false)
@@ -141,18 +144,18 @@ public class shooterSystem extends SubsystemBase {
 
 
         if (direction) {
-            // _collectorPower.set(Constants.collectorSpeed);
+            _collectorPower.set(Constants.collectorSpeed);
         }
         else if (!direction) {
-            // _collectorPower.set(-Constants.collectorSpeed);
+            _collectorPower.set(-Constants.collectorSpeed);
         }
         else {
-            // _collectorPower.set(0.0);
+            _collectorPower.set(0.0);
         }
     }
 
     public void stopCollectorPower() {
-        // _collectorPower.set(0.0);
+        _collectorPower.set(0.0);
     }
 
 }

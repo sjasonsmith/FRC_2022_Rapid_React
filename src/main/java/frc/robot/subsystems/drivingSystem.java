@@ -157,19 +157,5 @@ public class drivingSystem extends SubsystemBase {
     public void drive(ChassisSpeeds chassisSpeeds) {
         m_chassisSpeeds = chassisSpeeds;
     }
-  
-    public void resetOtherEncoders() {
-
-    }
-
-    //Circumfrence (Distance Traveled By Rotation) is C=d*Pi
-
-    
-
-    public void driveDistance(double setpoint) {
-    }
-
-    public void stopAllMotors() {
-    }
 
 }
