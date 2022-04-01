@@ -85,6 +85,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+     // Zero Gyroscope as soon as teleop starts, move to autonomous when that works.
+     m_robotContainer.m_driving.zeroGyroscope();
+     //COMMENT IN PRODUCTION
   }
 
   /** This function is called periodically during operator control. */

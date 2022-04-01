@@ -65,7 +65,7 @@ public final class Constants {
 
     // Speeds
     public static final double shooterAssistSpeed = -0.75;
-    public static final double collectorMovementSpeed = 0.95;
-    public static final double collectorSpeed = 0.85;
+    public static final double collectorMovementSpeed = 0.25;
+    public static final double collectorSpeed = 0.95;
     public static final double liftArmSpeed = 0.40;
 }

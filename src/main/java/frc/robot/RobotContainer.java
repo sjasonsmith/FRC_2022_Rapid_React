@@ -40,7 +40,7 @@ public class RobotContainer {
       m_driving,
             () -> modifyAxis(driveStick.getRawAxis(1)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(driveStick.getRawAxis(0)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+            () -> modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
     // Configure the button bindings
     configureButtonBindings();
@@ -53,7 +53,7 @@ public class RobotContainer {
 
     //Shoot Forward At 75%
     new JoystickButton(driveStick, 7).whenPressed(() -> m_driving.zeroGyroscope());
-    new JoystickButton(driveStick, 6).whenPressed(() -> m_shooting.runShooter(0.99)).whenReleased(() -> m_shooting.stopSystem());
+    new JoystickButton(driveStick, 6).whileHeld(() -> m_shooting.runShooter(0.99)).whenReleased(() -> m_shooting.stopSystem());
     new JoystickButton(driveStick, 5).whenPressed(() -> m_shooting.runShooterAssist()).whenReleased(() -> m_shooting.stopAssist());
 
     // When DPAD-UP is pressed run the collector up

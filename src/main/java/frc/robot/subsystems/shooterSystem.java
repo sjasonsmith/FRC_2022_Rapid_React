@@ -43,24 +43,22 @@ public class shooterSystem extends SubsystemBase {
     String colorString;
     ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
+    boolean timerSet = false;
+
     public void runShooter(double shooterSpeed) {
 
+        if (!timerSet) {
         shootingTimer.reset();
         shootingTimer.start();
+        timerSet = true;
+        }
 
         _shooterPower.set(-shooterSpeed);
-        runShooterTimerCall();
-    }
-
-    public void runShooterTimerCall() {
         // IF NOW (5MS) - startTime (0MS) is greater than 0.5 then run the shooter
-        if (shootingTimer.get() > 3) {
+        if (shootingTimer.get() > 0.75) {
             _shooterAssist.set(Constants.shooterAssistSpeed);
         }
-        else {
-            runShooterTimerCall();;
-        }
-    }
+    }   
 
     public void runShooterAssist() {
         _shooterAssist.set(Constants.shooterAssistSpeed);
@@ -77,6 +75,7 @@ public class shooterSystem extends SubsystemBase {
     public void stopSystem() {
         _shooterPower.set(0.0);
         _shooterAssist.set(0.0);
+        timerSet = false;
     }
     
 
