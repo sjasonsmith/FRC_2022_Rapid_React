@@ -18,12 +18,18 @@ public class Drivebackwards extends CommandBase {
     private double m_translationYSupplier;
     private double m_rotationSupplier;
 
+    private boolean timerSet = false;
+
     public Drivebackwards(drivingSystem drivetrainSubsystem) {
         // The 'script'
         
         // Reset and start timer, 'start of autonomous'
-        movementTimer.reset();
-        movementTimer.start();
+        
+        if (!timerSet) {
+            movementTimer.reset();
+            movementTimer.start();
+            timerSet = true;
+        }
 
         // Set drivetrain values
         this.m_drivetrainSubsystem = drivetrainSubsystem;
@@ -38,7 +44,10 @@ public class Drivebackwards extends CommandBase {
             this.m_translationYSupplier = 0;
             this.m_rotationSupplier = 0.5;
         }
-
-        // 
+        else {
+            this.m_translationXSupplier = 0;
+            this.m_translationYSupplier = 0;
+            this.m_rotationSupplier = 0;
+        }
     }
 }
