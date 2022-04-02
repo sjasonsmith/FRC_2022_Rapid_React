@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.Drivebackwards;
+// import frc.robot.commands.Drivebackwards;
 import frc.robot.subsystems.drivingSystem;
 
 
@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    m_robotContainer.m_driving.setDefaultCommand(new Drivebackwards(m_robotContainer.m_driving));
+    // m_robotContainer.m_driving.setDefaultCommand(new Drivebackwards(m_robotContainer.m_driving));
   }
 
   @Override
@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
     }
 
      // Zero Gyroscope as soon as teleop starts, move to autonomous when that works.
-     m_robotContainer.m_driving.zeroGyroscope();
+    //  m_robotContainer.m_driving.zeroGyroscope();
      //COMMENT IN PRODUCTION
   }
 

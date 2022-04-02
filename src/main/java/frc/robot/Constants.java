@@ -60,8 +60,9 @@ public final class Constants {
     public static final int shooterPowerCanID = 27;
     public static final int shooterAssistCanID = 28;
     public static final int collectorMovementCanID = 25;
-    public static final int leftLiftMotorCanID = 35;
-    public static final int rightLiftMotorCanID = 37;
+    public static final int leftTiltMotorCanID = 56;
+    public static final int rightTiltMotorCanID = 55;
+    public static final int winchCanID = 55;
 
     // Speeds
     public static final double shooterAssistSpeed = -0.75;

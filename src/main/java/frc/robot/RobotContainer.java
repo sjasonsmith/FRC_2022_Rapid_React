@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 public class RobotContainer {
 
   Joystick driveStick = new Joystick(0); //Should be a logitech F310, right USB
-  Joystick commandStick = new Joystick(1); //Should be a Logitech Extreme 3D pro.
+  Joystick liftJoyStick = new Joystick(1); //Should be a Logitech Extreme 3D pro.
 
   //Define Subsystems
   public final drivingSystem m_driving = new drivingSystem();
@@ -64,8 +64,6 @@ public class RobotContainer {
 
     // Collect
     new JoystickButton(driveStick, 1).whenPressed(() -> m_shooting.collect(true)).whenReleased(() -> m_shooting.stopCollectorPower());
-
-
     
     // Collect, but backwards...
 
@@ -74,9 +72,15 @@ public class RobotContainer {
 
     // Lift Arms!
 
-    new POVButton(driveStick, 0).whenPressed(() -> m_lifting.liftArmsUp()).whenReleased(() -> m_lifting.stopArms());
-    new POVButton(driveStick, 180).whenPressed(() -> m_lifting.liftArmsDown()).whenReleased(() -> m_lifting.stopArms());
-
+    // new POVButton(driveStick, 0).whenPressed(() -> m_lifting.liftArmsUp()).whenReleased(() -> m_lifting.stopArms());
+    // new POVButton(driveStick, 180).whenPressed(() -> m_lifting.liftArmsDown()).whenReleased(() -> m_lifting.stopArms());
+    new POVButton(driveStick, 90).whileHeld(() -> m_lifting.tiltArmsUp()).whenReleased(() -> m_lifting.stopArms());
+    // Tilt Arms Down
+    new POVButton(driveStick, 270).whileHeld(() -> m_lifting.tiltArmsDown()).whenReleased(() -> m_lifting.stopArms());
+    // Winch Arms Up
+    new POVButton(driveStick, 0).whileHeld(() -> m_lifting.winchArmsUp()).whenReleased(() -> m_lifting.stopWinchArms());
+    // Winch Arms Down
+    new POVButton(driveStick, 180).whileHeld(() -> m_lifting.winchArmsDown()).whenReleased(() -> m_lifting.stopWinchArms());
   }
 
   private static double deadband(double value, double deadband) {
