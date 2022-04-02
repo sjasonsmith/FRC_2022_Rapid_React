@@ -4,6 +4,7 @@ import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.drivingSystem;
 import frc.robot.subsystems.liftSystem;
 import frc.robot.subsystems.shooterSystem;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -34,13 +35,17 @@ public class RobotContainer {
     // Stick X axis -> left and right movement
     // Rotate Z axis -> rotation
 
-    
+    // Apply ramp rates by setting them in software, so see input and change the output, 
+    // motor controller does not know the difference.
+
+    // Make a ramp rate object and seconds to full rate is 0.75.
+    SlewRateLimiter rampRateApplier = new SlewRateLimiter(0.75);
 
     m_driving.setDefaultCommand(new DefaultDriveCommand(
       m_driving,
-            () -> modifyAxis(driveStick.getRawAxis(1)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(driveStick.getRawAxis(0)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+            () -> rampRateApplier.calculate(modifyAxis(driveStick.getRawAxis(1)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND),
+            () -> rampRateApplier.calculate(modifyAxis(driveStick.getRawAxis(0)) * m_driving.MAX_VELOCITY_METERS_PER_SECOND),
+            () -> rampRateApplier.calculate(modifyAxis(driveStick.getRawAxis(4)) * m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)
     ));
     // Configure the button bindings
     configureButtonBindings();
