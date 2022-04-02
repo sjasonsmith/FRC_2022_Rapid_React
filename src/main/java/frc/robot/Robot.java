@@ -7,7 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-// import frc.robot.commands.Drivebackwards;
+import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.Drivebackwards;
 import frc.robot.subsystems.drivingSystem;
 
 
@@ -73,7 +74,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    // m_robotContainer.m_driving.setDefaultCommand(new Drivebackwards(m_robotContainer.m_driving));
+    // Set default autonomous command, which is just running a command.
+    m_robotContainer.m_driving.setDefaultCommand(new Drivebackwards(m_robotContainer.m_driving));
   }
 
   @Override
@@ -93,7 +95,13 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  // Set default drive command for teleop, so we can actually control the robot.
+   m_robotContainer.m_driving.setDefaultCommand(new DefaultDriveCommand(m_robotContainer.m_driving, 
+   () -> m_robotContainer.modifyAxis(m_robotContainer.driveStick.getRawAxis(1)) * m_robotContainer.m_driving.MAX_VELOCITY_METERS_PER_SECOND,
+   () -> m_robotContainer.modifyAxis(m_robotContainer.driveStick.getRawAxis(0)) * m_robotContainer.m_driving.MAX_VELOCITY_METERS_PER_SECOND,
+   () -> m_robotContainer.modifyAxis(m_robotContainer.driveStick.getRawAxis(4)) * m_robotContainer.m_driving.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND));
+  }
 
   @Override
   public void testInit() {

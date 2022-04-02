@@ -17,7 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class RobotContainer {
 
-  Joystick driveStick = new Joystick(0); //Should be a logitech F310, right USB
+  public Joystick driveStick = new Joystick(0); //Should be a logitech F310, right USB
+  public 
   Joystick liftJoyStick = new Joystick(1); //Should be a Logitech Extreme 3D pro.
 
   //Define Subsystems
@@ -95,7 +96,7 @@ public class RobotContainer {
     }
   }
 
-  private static double modifyAxis(double value) {
+  public static double modifyAxis(double value) {
     // Deadband
     value = deadband(value, 0.15);
 
