@@ -62,7 +62,8 @@ public final class Constants {
     public static final int collectorMovementCanID = 25;
     public static final int leftTiltMotorCanID = 56;
     public static final int rightTiltMotorCanID = 55;
-    public static final int winchCanID = 55;
+    public static final int winchPWMID = 0;
+    
 
     // Speeds
     public static final double shooterAssistSpeed = -0.75;
