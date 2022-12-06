@@ -1,9 +1,0 @@
-IMMEDIENT:
-
--Fix speed multiplier issues
-
--Remap controls for gamepad
-
-LATER:
-
--Get shooter working with automatic collection.
